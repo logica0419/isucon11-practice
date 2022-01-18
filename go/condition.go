@@ -297,26 +297,28 @@ func insertConditionTicker() {
 			continue
 		}
 
-		tx, err := db.Beginx()
-		if err != nil {
-			log.Printf("db error: %v", err)
-		}
-		defer tx.Rollback()
+		go func() {
+			tx, err := db.Beginx()
+			if err != nil {
+				log.Printf("db error: %v", err)
+			}
+			defer tx.Rollback()
 
-		insertDataStore.Lock()
-		defer insertDataStore.Unlock()
+			insertDataStore.Lock()
+			defer insertDataStore.Unlock()
 
-		_, err = tx.NamedExec(
-			"INSERT INTO `isu_condition`"+
-				"	(`jia_isu_uuid`, `timestamp`, `is_sitting`, `condition`, `message`)"+
-				"	VALUES (:jia_isu_uuid, :timestamp, :is_sitting, :condition, :message)",
-			insertDataStore.data)
+			_, err = tx.NamedExec(
+				"INSERT INTO `isu_condition`"+
+					"	(`jia_isu_uuid`, `timestamp`, `is_sitting`, `condition`, `message`)"+
+					"	VALUES (:jia_isu_uuid, :timestamp, :is_sitting, :condition, :message)",
+				insertDataStore.data)
 
-		err = tx.Commit()
-		if err != nil {
-			log.Printf("db error: %v", err)
-		}
+			err = tx.Commit()
+			if err != nil {
+				log.Printf("db error: %v", err)
+			}
 
-		insertDataStore.data = []IsuCondition{}
+			insertDataStore.data = []IsuCondition{}
+		}()
 	}
 }
