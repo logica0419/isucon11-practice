@@ -239,19 +239,17 @@ func postIsuCondition(c echo.Context) error {
 	// defer tx.Rollback()
 
 	isuIDValidMap.Lock()
-	defer isuIDValidMap.Unlock()
 	if _, ok := isuIDValidMap.validMap[jiaIsuUUID]; !ok {
 		var id int
 		err = db.Get(&id, "SELECT `id` FROM `isu` WHERE `jia_isu_uuid` = ? LIMIT 1", jiaIsuUUID)
 		if err != nil {
+			isuIDValidMap.Unlock()
 			c.Logger().Errorf("db error: %v", err)
 			return c.NoContent(http.StatusInternalServerError)
 		}
 		isuIDValidMap.validMap[jiaIsuUUID] = 1
 	}
-
-	insertDataStore.Lock()
-	defer insertDataStore.Unlock()
+	isuIDValidMap.Unlock()
 
 	for _, cond := range req {
 		timestamp := time.Unix(cond.Timestamp, 0)
@@ -268,7 +266,9 @@ func postIsuCondition(c echo.Context) error {
 			Message:    cond.Message,
 		}
 
+		insertDataStore.Lock()
 		insertDataStore.data = append(insertDataStore.data, isuCondition)
+		insertDataStore.Unlock()
 
 		// _, err = tx.Exec(
 		// 	"INSERT INTO `isu_condition`"+
@@ -301,7 +301,7 @@ var insertDataStore = insertData{
 }
 
 func insertConditionTicker() {
-	t := time.NewTicker(2000 * time.Millisecond) //1秒周期の ticker
+	t := time.NewTicker(1500 * time.Millisecond) //1秒周期の ticker
 	defer t.Stop()
 
 	for {
@@ -315,6 +315,7 @@ func insertConditionTicker() {
 			tx, err := db.Beginx()
 			if err != nil {
 				log.Printf("db error: %v", err)
+				return
 			}
 			defer tx.Rollback()
 
@@ -330,6 +331,7 @@ func insertConditionTicker() {
 			err = tx.Commit()
 			if err != nil {
 				log.Printf("db error: %v", err)
+				return
 			}
 
 			insertDataStore.data = []IsuCondition{}
