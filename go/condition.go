@@ -205,7 +205,7 @@ type PostIsuConditionRequest struct {
 }
 
 var (
-	isuIDValidMap   = map[string]bool{}
+	isuIDValidMap   = map[string]int{}
 	isuIDValidMutex sync.RWMutex
 )
 
@@ -235,7 +235,7 @@ func postIsuCondition(c echo.Context) error {
 	// defer tx.Rollback()
 
 	isuIDValidMutex.RLock()
-	if isuIDValidMap[jiaIsuUUID] == false {
+	if _, ok := isuIDValidMap[jiaIsuUUID]; !ok {
 		isuIDValidMutex.RUnlock()
 		var id int
 		err = db.Get(&id, "SELECT `id` FROM `isu` WHERE `jia_isu_uuid` = ? LIMIT 1", jiaIsuUUID)
@@ -245,7 +245,7 @@ func postIsuCondition(c echo.Context) error {
 		}
 
 		isuIDValidMutex.Lock()
-		isuIDValidMap[jiaIsuUUID] = true
+		isuIDValidMap[jiaIsuUUID] = 1
 		isuIDValidMutex.Unlock()
 	}
 

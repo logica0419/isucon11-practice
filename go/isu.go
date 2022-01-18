@@ -261,7 +261,7 @@ func postIsu(c echo.Context) error {
 	}
 
 	isuIDValidMutex.Lock()
-	isuIDValidMap[jiaIsuUUID] = true
+	isuIDValidMap[jiaIsuUUID] = 1
 	isuIDValidMutex.Unlock()
 
 	return c.JSON(http.StatusCreated, isu)
