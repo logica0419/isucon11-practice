@@ -234,20 +234,18 @@ func postIsuCondition(c echo.Context) error {
 	// }
 	// defer tx.Rollback()
 
-	isuIDValidMutex.RLock()
+	isuIDValidMutex.Lock()
+	defer isuIDValidMutex.Unlock()
 	if _, ok := isuIDValidMap[jiaIsuUUID]; !ok {
-		isuIDValidMutex.RUnlock()
 		var id int
 		err = db.Get(&id, "SELECT `id` FROM `isu` WHERE `jia_isu_uuid` = ? LIMIT 1", jiaIsuUUID)
 		if err != nil {
 			c.Logger().Errorf("db error: %v", err)
 			return c.NoContent(http.StatusInternalServerError)
 		}
-
-		isuIDValidMutex.Lock()
 		isuIDValidMap[jiaIsuUUID] = 1
-		isuIDValidMutex.Unlock()
 	}
+	isuIDValidMutex.Unlock()
 
 	for _, cond := range req {
 		timestamp := time.Unix(cond.Timestamp, 0)
