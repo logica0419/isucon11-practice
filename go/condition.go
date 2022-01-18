@@ -206,8 +206,6 @@ type PostIsuConditionRequest struct {
 // POST /api/condition/:jia_isu_uuid
 // ISUからのコンディションを受け取る
 func postIsuCondition(c echo.Context) error {
-	c.NoContent(http.StatusAccepted)
-
 	jiaIsuUUID := c.Param("jia_isu_uuid")
 	if jiaIsuUUID == "" {
 		return c.String(http.StatusBadRequest, "missing: jia_isu_uuid")
