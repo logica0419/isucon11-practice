@@ -15,11 +15,10 @@ CREATE TABLE `isu` (
   `jia_user_id` VARCHAR(255) NOT NULL,
   `created_at` DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
   `updated_at` DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-  PRIMARY KEY(`jia_isu_uuid`, `jia_user_id`)
+  PRIMARY KEY(`id`),
+  INDEX idx_isu_use (`jia_isu_uuid`, `jia_user_id`),
+  INDEX idx_character (`character`)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4;
-
-ALTER TABLE `isu`
-ADD INDEX idx_character (`character`);
 
 CREATE TABLE `isu_condition` (
   `id` bigint AUTO_INCREMENT,
@@ -29,7 +28,8 @@ CREATE TABLE `isu_condition` (
   `condition` VARCHAR(255) NOT NULL,
   `message` VARCHAR(255) NOT NULL,
   `created_at` DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
-  PRIMARY KEY(`jia_isu_uuid`, `timestamp`)
+  PRIMARY KEY(`id`),
+  INDEX idx_jia_id_time (`jia_isu_uuid`, `timestamp`)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4;
 
 CREATE TABLE `user` (
