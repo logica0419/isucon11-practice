@@ -300,7 +300,7 @@ var insertDataStore = insertData{
 }
 
 func insertConditionTicker() {
-	t := time.NewTicker(3000 * time.Millisecond) //1秒周期の ticker
+	t := time.NewTicker(2200 * time.Millisecond) //1秒周期の ticker
 	defer t.Stop()
 
 	for {
