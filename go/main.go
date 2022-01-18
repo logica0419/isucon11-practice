@@ -119,7 +119,7 @@ func main() {
 	e.Debug = true
 	e.Logger.SetLevel(log.DEBUG)
 
-	listener, err := net.Listen("unix", "/home/isucon/isucon.sock")
+	listener, err := net.Listen("unix", "/temp/isucon.sock")
 	if err != nil {
 		log.Fatal(err)
 	}
