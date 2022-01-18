@@ -260,6 +260,10 @@ func postIsu(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
+	isuIDValidMutex.Lock()
+	isuIDValidMap[jiaIsuUUID] = true
+	isuIDValidMutex.Unlock()
+
 	return c.JSON(http.StatusCreated, isu)
 }
 
