@@ -123,6 +123,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer listener.Close()
 	e.Listener = listener
 
 	e.Use(middleware.Logger())
