@@ -205,8 +205,12 @@ type PostIsuConditionRequest struct {
 }
 
 var (
-	isuIDValidMap   = map[string]int{}
-	isuIDValidMutex sync.RWMutex
+	isuIDValidMap = struct {
+		validMap map[string]int
+		sync.Mutex
+	}{
+		validMap: map[string]int{},
+	}
 )
 
 // POST /api/condition/:jia_isu_uuid
@@ -234,18 +238,17 @@ func postIsuCondition(c echo.Context) error {
 	// }
 	// defer tx.Rollback()
 
-	isuIDValidMutex.Lock()
-	defer isuIDValidMutex.Unlock()
-	if _, ok := isuIDValidMap[jiaIsuUUID]; !ok {
+	isuIDValidMap.Lock()
+	defer isuIDValidMap.Unlock()
+	if _, ok := isuIDValidMap.validMap[jiaIsuUUID]; !ok {
 		var id int
 		err = db.Get(&id, "SELECT `id` FROM `isu` WHERE `jia_isu_uuid` = ? LIMIT 1", jiaIsuUUID)
 		if err != nil {
 			c.Logger().Errorf("db error: %v", err)
 			return c.NoContent(http.StatusInternalServerError)
 		}
-		isuIDValidMap[jiaIsuUUID] = 1
+		isuIDValidMap.validMap[jiaIsuUUID] = 1
 	}
-	isuIDValidMutex.Unlock()
 
 	for _, cond := range req {
 		timestamp := time.Unix(cond.Timestamp, 0)
