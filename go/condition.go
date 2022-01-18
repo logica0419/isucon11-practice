@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -245,13 +246,15 @@ func postIsuCondition(c echo.Context) error {
 
 		isuCondition := IsuCondition{
 			JIAIsuUUID: jiaIsuUUID,
+			Timestamp:  timestamp,
 			IsSitting:  cond.IsSitting,
 			Condition:  cond.Condition,
 			Message:    cond.Message,
-			Timestamp:  timestamp,
 		}
 
-		insertData = append(insertData, isuCondition)
+		insertDataStore.Lock()
+		insertDataStore.data = append(insertDataStore.data, isuCondition)
+		insertDataStore.Unlock()
 
 		// _, err = tx.Exec(
 		// 	"INSERT INTO `isu_condition`"+
@@ -274,7 +277,14 @@ func postIsuCondition(c echo.Context) error {
 	return c.NoContent(http.StatusAccepted)
 }
 
-var insertData = []IsuCondition{}
+type insertData struct {
+	data []IsuCondition
+	sync.Mutex
+}
+
+var insertDataStore = insertData{
+	data: []IsuCondition{},
+}
 
 func insertConditionTicker() {
 	t := time.NewTicker(1 * time.Second) //1秒周期の ticker
@@ -283,7 +293,7 @@ func insertConditionTicker() {
 	for {
 		<-t.C
 
-		if len(insertData) == 0 {
+		if len(insertDataStore.data) == 0 {
 			continue
 		}
 
@@ -293,15 +303,20 @@ func insertConditionTicker() {
 		}
 		defer tx.Rollback()
 
+		insertDataStore.Lock()
+		defer insertDataStore.Unlock()
+
 		_, err = tx.NamedExec(
 			"INSERT INTO `isu_condition`"+
 				"	(`jia_isu_uuid`, `timestamp`, `is_sitting`, `condition`, `message`)"+
 				"	VALUES (:jia_isu_uuid, :timestamp, :is_sitting, :condition, :message)",
-			insertData)
+			insertDataStore.data)
 
 		err = tx.Commit()
 		if err != nil {
 			log.Printf("db error: %v", err)
 		}
+
+		insertDataStore.data = []IsuCondition{}
 	}
 }
