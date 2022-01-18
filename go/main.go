@@ -4,6 +4,7 @@ import (
 	"crypto/ecdsa"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -118,6 +119,12 @@ func main() {
 	e.Debug = true
 	e.Logger.SetLevel(log.DEBUG)
 
+	listener, err := net.Listen("unix", "/home/isucon/isucon.sock")
+	if err != nil {
+		log.Fatal(err)
+	}
+	e.Listener = listener
+
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
@@ -145,7 +152,6 @@ func main() {
 
 	mySQLConnectionData = NewMySQLConnectionEnv()
 
-	var err error
 	db, err = mySQLConnectionData.ConnectDB()
 	if err != nil {
 		e.Logger.Fatalf("failed to connect db: %v", err)
@@ -163,8 +169,7 @@ func main() {
 	go insertConditionTicker()
 
 	go http.ListenAndServe(":6060", nil)
-	serverPort := fmt.Sprintf(":%v", getEnv("SERVER_APP_PORT", "3000"))
-	e.Logger.Fatal(e.Start(serverPort))
+	e.Logger.Fatal(e.Start(""))
 }
 
 func getIndex(c echo.Context) error {
