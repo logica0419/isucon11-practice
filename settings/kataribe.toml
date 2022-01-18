@@ -119,4 +119,29 @@ duration_index = 10
 #regexp = '\s+HTTP/[0-9.]+$'
 #replace = ''
 
+[[bundle]]
+regexp = '^GET /api/condition'
+name = "GET /api/condition/*"
+[[bundle]]
+regexp='^POST /api/condition'
+name ="POST /api/condition/*"
+[[bundle]]
+regexp = '^GET /api/isu/.+/icon'
+name = "GET /api/isu/*/icon"
+[[bundle]]
+regexp = '^GET /api/isu/.+/graph'
+name = "GET /api/isu/*/graph"
+[[bundle]]
+regexp = '^GET /api/isu'
+name = "GET /api/isu/*"
+[[bundle]]
+regexp = '^GET /assets'
+name = "GET /assets/*"
+[[bundle]]
+regexp = '^GET /isu'
+name = "GET /isu/*"
+[[bundle]]
+regexp = '^GET /'
+name = "GET /*"
+
 ################################################################################
