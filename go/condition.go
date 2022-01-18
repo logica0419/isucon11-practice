@@ -250,6 +250,9 @@ func postIsuCondition(c echo.Context) error {
 		isuIDValidMap.validMap[jiaIsuUUID] = 1
 	}
 
+	insertDataStore.Lock()
+	defer insertDataStore.Unlock()
+
 	for _, cond := range req {
 		timestamp := time.Unix(cond.Timestamp, 0)
 
@@ -265,9 +268,7 @@ func postIsuCondition(c echo.Context) error {
 			Message:    cond.Message,
 		}
 
-		insertDataStore.Lock()
 		insertDataStore.data = append(insertDataStore.data, isuCondition)
-		insertDataStore.Unlock()
 
 		// _, err = tx.Exec(
 		// 	"INSERT INTO `isu_condition`"+
