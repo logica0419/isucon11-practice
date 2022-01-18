@@ -13,5 +13,7 @@ ExecStart=/home/isucon/webapp/go/isucondition
 Restart   = always
 Type      = simple
 
+LimitNOFILE=65535
+
 [Install]
 WantedBy=multi-user.target
