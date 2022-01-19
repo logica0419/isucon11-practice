@@ -335,6 +335,7 @@ func insertConditionTicker() {
 			}
 
 			insertDataStore.data = []IsuCondition{}
+			return
 		}()
 	}
 }
