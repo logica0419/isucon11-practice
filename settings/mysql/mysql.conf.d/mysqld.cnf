@@ -25,6 +25,7 @@ user		= mysql
 innodb_buffer_pool_size = 3GB # ディスクイメージをメモリ上にバッファさせる値をきめる設定値(メモリの75%くらい)
 innodb_flush_log_at_trx_commit = 0 # 1に設定するとトランザクション単位でログを出力するが 2 を指定すると1秒間に1回ログファイルに出力するようになる
 innodb_log_file_size = 1GB # InnoDBの更新ログを記録するディスク上のファイルサイズ(innodb_buffer_pool_sizeの4分の1程度)
+skip-innodb-doublewrite
 
 # autocommit = 0
 
@@ -82,6 +83,5 @@ long_query_time        = 0
 # max_binlog_size   = 100M
 # binlog_do_db		= include_database_name
 # binlog_ignore_db	= include_database_name
-# skip-log-bin
-# innodb_log_group_home_dir = /dev/shm/
-# innodb_doublewrite = 0
+skip-log-bin
+
