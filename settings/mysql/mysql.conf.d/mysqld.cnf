@@ -86,4 +86,3 @@ long_query_time        = 0
 disable-log-bin
 innodb_log_group_home_dir = /dev/shm/
 innodb_doublewrite = 0
-innodb_flush_log_at_trx_commit = 0
