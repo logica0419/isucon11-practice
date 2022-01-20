@@ -38,7 +38,7 @@ func getTrend(c echo.Context) error {
 }
 
 func resetTrendCacheTicker() {
-	t := time.NewTicker(time.Second * 2)
+	t := time.NewTicker(time.Second * 1)
 
 	for {
 		<-t.C
