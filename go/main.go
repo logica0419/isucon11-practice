@@ -35,7 +35,7 @@ const (
 	scoreConditionLevelWarning  = 2
 	scoreConditionLevelCritical = 1
 
-	trendTickerTime  = 1200
+	trendTickerTime  = 1300
 	insertTickerTime = 400
 )
 
