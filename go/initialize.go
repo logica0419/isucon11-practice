@@ -39,10 +39,17 @@ func postInitialize(c echo.Context) error {
 	for _, condition := range conditions {
 		condLevel, err := calculateConditionLevel(condition.Condition)
 		if err != nil {
+			err = nil
 			continue
 		}
 
-		_, err = db.Exec("UPDATE `isu_condition` SET `condition_level` = ? WHERE  `id` = ?", condLevel, condition.ID)
+		if condLevel != conditionLevelInfo {
+			_, err = db.Exec("UPDATE `isu_condition` SET `condition_level` = ? WHERE  `id` = ?", condLevel, condition.ID)
+			if err != nil {
+				err = nil
+				continue
+			}
+		}
 	}
 
 	_, err = db.Exec(
