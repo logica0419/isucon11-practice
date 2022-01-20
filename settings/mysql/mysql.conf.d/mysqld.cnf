@@ -70,7 +70,7 @@ log_error = /var/log/mysql/error.log
 #
 # Here you can see queries with especially long duration
 slow_query_log         = 1
-slow_query_log_file    = /temp/slow-query.log
+# slow_query_log_file    = /temp/slow-query.log
 long_query_time        = 0
 # log-queries-not-using-indexes
 #
@@ -85,4 +85,4 @@ long_query_time        = 0
 # binlog_ignore_db	= include_database_name
 skip-log-bin
 
-group_concat_max_len = 10
+# group_concat_max_len = 10
