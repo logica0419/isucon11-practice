@@ -129,7 +129,7 @@ func getJIAServiceURL(tx *sqlx.Tx) string {
 	return config.URL
 }
 
-var targetURL string
+var targetURL = ""
 
 // POST /api/isu
 // ISUを登録
