@@ -129,6 +129,8 @@ func getJIAServiceURL(tx *sqlx.Tx) string {
 	return config.URL
 }
 
+var targetURL string
+
 // POST /api/isu
 // ISUを登録
 func postIsu(c echo.Context) error {
@@ -198,7 +200,9 @@ func postIsu(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	targetURL := getJIAServiceURL(tx) + "/api/activate"
+	if targetURL == "" {
+		targetURL = getJIAServiceURL(tx) + "/api/activate"
+	}
 	body := JIAServiceRequest{postIsuConditionTargetBaseURL, jiaIsuUUID}
 	bodyJSON, err := json.Marshal(body)
 	if err != nil {
