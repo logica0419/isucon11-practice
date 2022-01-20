@@ -264,6 +264,9 @@ func postIsu(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
+	uniqueID := jiaUserID + jiaIsuUUID
+	imageCacheMap[uniqueID] = image
+
 	return c.JSON(http.StatusCreated, isu)
 }
 
