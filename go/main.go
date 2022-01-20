@@ -165,6 +165,7 @@ func main() {
 	}
 
 	go insertConditionTicker()
+	go resetTrendCacheTicker()
 
 	go http.ListenAndServe(":6060", nil)
 
