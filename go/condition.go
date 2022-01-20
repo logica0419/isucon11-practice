@@ -124,7 +124,7 @@ func getIsuConditions(c echo.Context) error {
 			return c.String(http.StatusUnauthorized, "you are not signed in")
 		}
 
-		c.Logger().Error(err)
+		// c.Logger().Error(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
@@ -167,13 +167,13 @@ func getIsuConditions(c echo.Context) error {
 			return c.String(http.StatusNotFound, "not found: isu")
 		}
 
-		c.Logger().Errorf("db error: %v", err)
+		//c.Logger().Errorf("db error: %v", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	conditionsResponse, err := getIsuConditionsFromDB(db, jiaIsuUUID, endTime, conditionLevel, startTime, conditionLimit, isuName)
 	if err != nil {
-		c.Logger().Errorf("db error: %v", err)
+		// c.Logger().Errorf("db error: %v", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 	return c.JSON(http.StatusOK, conditionsResponse)
@@ -260,7 +260,7 @@ func postIsuCondition(c echo.Context) error {
 		err = db.Get(&id, "SELECT `id` FROM `isu` WHERE `jia_isu_uuid` = ? LIMIT 1", jiaIsuUUID)
 		if err != nil {
 			isuIDValidMap.Unlock()
-			c.Logger().Errorf("db error: %v", err)
+			// c.Logger().Errorf("db error: %v", err)
 			return c.NoContent(http.StatusInternalServerError)
 		}
 		isuIDValidMap.validMap[jiaIsuUUID] = 1

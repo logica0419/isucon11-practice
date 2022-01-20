@@ -30,7 +30,7 @@ func postInitialize(c echo.Context) error {
 	cmd.Stdout = os.Stderr
 	err = cmd.Run()
 	if err != nil {
-		c.Logger().Errorf("exec init.sh error: %v", err)
+		// c.Logger().Errorf("exec init.sh error: %v", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
@@ -40,7 +40,7 @@ func postInitialize(c echo.Context) error {
 		request.JIAServiceURL,
 	)
 	if err != nil {
-		c.Logger().Errorf("db error : %v", err)
+		// c.Logger().Errorf("db error : %v", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 

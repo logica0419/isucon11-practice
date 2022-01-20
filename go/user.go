@@ -19,7 +19,7 @@ func getMe(c echo.Context) error {
 			return c.String(http.StatusUnauthorized, "you are not signed in")
 		}
 
-		c.Logger().Error(err)
+		// c.Logger().Error(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
