@@ -34,24 +34,6 @@ func postInitialize(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	conditions := []IsuCondition{}
-	err = db.Select(&conditions, "SELECT * FROM `isu_condition`")
-	for _, condition := range conditions {
-		condLevel, err := calculateConditionLevel(condition.Condition)
-		if err != nil {
-			err = nil
-			continue
-		}
-
-		if condLevel != conditionLevelInfo {
-			_, err = db.Exec("UPDATE `isu_condition` SET `condition_level` = ? WHERE  `id` = ?", condLevel, condition.ID)
-			if err != nil {
-				err = nil
-				continue
-			}
-		}
-	}
-
 	_, err = db.Exec(
 		"INSERT INTO `isu_association_config` (`name`, `url`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `url` = VALUES(`url`)",
 		"jia_service_url",
