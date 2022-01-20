@@ -322,6 +322,7 @@ func getIsuIcon(c echo.Context) error {
 	imageCacheMap.RLock()
 	image, ok := imageCacheMap.imageMap[uniqueID]
 	imageCacheMap.RUnlock()
+
 	if !ok {
 		err = db.Get(&image, "SELECT `image` FROM `isu` WHERE `jia_user_id` = ? AND `jia_isu_uuid` = ?",
 			jiaUserID, jiaIsuUUID)
