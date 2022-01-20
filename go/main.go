@@ -8,6 +8,8 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -33,6 +35,14 @@ const (
 	scoreConditionLevelWarning  = 2
 	scoreConditionLevelCritical = 1
 )
+
+type MySQLConnectionEnv struct {
+	Host     string
+	Port     string
+	User     string
+	DBName   string
+	Password string
+}
 
 var (
 	db                  *sqlx.DB
@@ -68,14 +78,6 @@ type IsuCondition struct {
 	Condition  string    `db:"condition"`
 	Message    string    `db:"message"`
 	CreatedAt  time.Time `db:"created_at"`
-}
-
-type MySQLConnectionEnv struct {
-	Host     string
-	Port     string
-	User     string
-	DBName   string
-	Password string
 }
 
 func getEnv(key string, defaultValue string) string {
@@ -119,13 +121,6 @@ func main() {
 	e.Debug = true
 	e.Logger.SetLevel(log.DEBUG)
 
-	listener, err := net.Listen("unix", "/temp/isucon.sock")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer listener.Close()
-	e.Listener = listener
-
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
@@ -153,6 +148,7 @@ func main() {
 
 	mySQLConnectionData = NewMySQLConnectionEnv()
 
+	var err error
 	db, err = mySQLConnectionData.ConnectDB()
 	if err != nil {
 		e.Logger.Fatalf("failed to connect db: %v", err)
@@ -170,7 +166,30 @@ func main() {
 	go insertConditionTicker()
 
 	go http.ListenAndServe(":6060", nil)
-	e.Logger.Fatal(e.Start(""))
+
+	socketFilePath := "/temp/isucon.sock"
+	listener, err := net.Listen("unix", socketFilePath)
+	if err != nil {
+		log.Panic(err)
+	}
+	if err := os.Chmod(socketFilePath, 0777); err != nil {
+		log.Panic(err)
+	}
+	closeFunc := func() {
+		listener.Close()
+		os.Remove(socketFilePath)
+		os.Exit(0)
+	}
+	s := make(chan os.Signal, 1)
+	signal.Notify(s, os.Interrupt, os.Kill, syscall.SIGTERM)
+	go func(s chan os.Signal) {
+		<-s
+		closeFunc()
+	}(s)
+	defer closeFunc()
+
+	e.Listener = listener
+	e.Logger.Panic(e.Start(""))
 }
 
 func getIndex(c echo.Context) error {
