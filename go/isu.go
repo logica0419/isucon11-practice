@@ -73,11 +73,11 @@ func getIsuList(c echo.Context) error {
 
 		var formattedCondition *GetIsuConditionResponse
 		if foundLastCondition {
-			conditionLevel, err := calculateConditionLevel(lastCondition.Condition)
-			if err != nil {
-				// c.Logger().Error(err)
-				return c.NoContent(http.StatusInternalServerError)
-			}
+			// conditionLevel, err := calculateConditionLevel(lastCondition.Condition)
+			// if err != nil {
+			// 	// c.Logger().Error(err)
+			// 	return c.NoContent(http.StatusInternalServerError)
+			// }
 
 			formattedCondition = &GetIsuConditionResponse{
 				JIAIsuUUID:     lastCondition.JIAIsuUUID,
@@ -85,7 +85,7 @@ func getIsuList(c echo.Context) error {
 				Timestamp:      lastCondition.Timestamp.Unix(),
 				IsSitting:      lastCondition.IsSitting,
 				Condition:      lastCondition.Condition,
-				ConditionLevel: conditionLevel,
+				ConditionLevel: lastCondition.ConditionLevel,
 				Message:        lastCondition.Message,
 			}
 		}
