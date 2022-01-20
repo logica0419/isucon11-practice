@@ -53,7 +53,8 @@ func getIsuConditionsFromDB(db *sqlx.DB, jiaIsuUUID string, endTime time.Time, c
 	} else {
 		sql, params, err := sqlx.In(
 			"SELECT * FROM `isu_condition` WHERE `jia_isu_uuid` = ?"+
-				"	AND `timestamp` BETWEEN ? AND ?"+
+				"	AND `timestamp` < ?"+
+				"	AND ? <= `timestamp`"+
 				"	AND `condition_level` IN (?)"+
 				"	ORDER BY `timestamp` DESC"+
 				" LIMIT ?",
