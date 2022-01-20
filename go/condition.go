@@ -58,7 +58,7 @@ func getIsuConditionsFromDB(db *sqlx.DB, jiaIsuUUID string, endTime time.Time, c
 				"	AND `condition_level` IN (?)"+
 				"	ORDER BY `timestamp` DESC"+
 				" LIMIT ?",
-			jiaIsuUUID, startTime, endTime, condLevelKeys, limit)
+			jiaIsuUUID, endTime, startTime, condLevelKeys, limit)
 		if err != nil {
 			return nil, fmt.Errorf("db error: %v", err)
 		}
