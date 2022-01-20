@@ -49,7 +49,7 @@ func getIsuConditionsFromDB(db *sqlx.DB, jiaIsuUUID string, endTime time.Time, c
 			return nil, fmt.Errorf("db error: %v", err)
 		}
 
-		err = db.Select(&conditions, sql, params)
+		err = db.Select(&conditions, sql, params...)
 	} else {
 		sql, params, err := sqlx.In(
 			"SELECT * FROM `isu_condition` WHERE `jia_isu_uuid` = ?"+
@@ -63,7 +63,7 @@ func getIsuConditionsFromDB(db *sqlx.DB, jiaIsuUUID string, endTime time.Time, c
 			return nil, fmt.Errorf("db error: %v", err)
 		}
 
-		err = db.Select(&conditions, sql, params)
+		err = db.Select(&conditions, sql, params...)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("db error: %v", err)
