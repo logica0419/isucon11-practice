@@ -52,7 +52,7 @@ func getTrend(c echo.Context) error {
 		isuAndConditionList := []IsuAndCondition{}
 		err = db.Select(&isuAndConditionList,
 			"SELECT isu.id AS id,"+
-				" GROUP_CONCAT(DISTINCT isu_condition.condition_level ORDER BY isu_condition.timestamp DESC) AS condition_level_list,"+
+				" GROUP_CONCAT(isu_condition.condition_level ORDER BY isu_condition.timestamp DESC) AS condition_level_list,"+
 				" MAX(isu_condition.timestamp) AS timestamp"+
 				" FROM isu"+
 				" INNER JOIN isu_condition ON isu.jia_isu_uuid = isu_condition.jia_isu_uuid"+
