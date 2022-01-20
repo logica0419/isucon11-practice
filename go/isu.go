@@ -319,9 +319,9 @@ func getIsuIcon(c echo.Context) error {
 	var image []byte
 
 	uniqueID := jiaUserID + jiaIsuUUID
-	imageCacheMap.RLock()
+	imageCacheMap.Lock()
+	defer imageCacheMap.Unlock()
 	image, ok := imageCacheMap.imageMap[uniqueID]
-	imageCacheMap.RUnlock()
 
 	if !ok {
 		err = db.Get(&image, "SELECT `image` FROM `isu` WHERE `jia_user_id` = ? AND `jia_isu_uuid` = ?",
@@ -335,9 +335,7 @@ func getIsuIcon(c echo.Context) error {
 			return c.NoContent(http.StatusInternalServerError)
 		}
 
-		imageCacheMap.Lock()
 		imageCacheMap.imageMap[uniqueID] = image
-		imageCacheMap.Unlock()
 	}
 
 	return c.Blob(http.StatusOK, "", image)
