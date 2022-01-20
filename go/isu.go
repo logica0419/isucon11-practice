@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -294,12 +293,7 @@ func getIsuID(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-var imageCacheMap = struct {
-	imageMap map[string][]byte
-	sync.RWMutex
-}{
-	imageMap: map[string][]byte{},
-}
+var imageCacheMap = map[string][]byte{}
 
 // GET /api/isu/:jia_isu_uuid/icon
 // ISUのアイコンを取得
@@ -319,9 +313,7 @@ func getIsuIcon(c echo.Context) error {
 	var image []byte
 
 	uniqueID := jiaUserID + jiaIsuUUID
-	imageCacheMap.Lock()
-	defer imageCacheMap.Unlock()
-	image, ok := imageCacheMap.imageMap[uniqueID]
+	image, ok := imageCacheMap[uniqueID]
 
 	if !ok {
 		err = db.Get(&image, "SELECT `image` FROM `isu` WHERE `jia_user_id` = ? AND `jia_isu_uuid` = ?",
@@ -335,7 +327,7 @@ func getIsuIcon(c echo.Context) error {
 			return c.NoContent(http.StatusInternalServerError)
 		}
 
-		imageCacheMap.imageMap[uniqueID] = image
+		imageCacheMap[uniqueID] = image
 	}
 
 	return c.Blob(http.StatusOK, "", image)
