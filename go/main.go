@@ -35,8 +35,8 @@ const (
 	scoreConditionLevelWarning  = 2
 	scoreConditionLevelCritical = 1
 
-	trendTickerTime  = 1000
-	insertTickerTime = 300
+	trendTickerTime  = 1500
+	insertTickerTime = 500
 )
 
 type MySQLConnectionEnv struct {
