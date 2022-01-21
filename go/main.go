@@ -109,7 +109,7 @@ func (mc *MySQLConnectionEnv) ConnectDB() (*sqlx.DB, error) {
 
 func init() {
 	// sessionStore = sessions.NewCookieStore([]byte(getEnv("SESSION_KEY", "isucondition")))
-	sessionStore = sessions.NewCookieStore([]byte{})
+	sessionStore = sessions.NewCookieStore(nil)
 
 	key, err := ioutil.ReadFile(jiaJWTSigningKeyPath)
 	if err != nil {
