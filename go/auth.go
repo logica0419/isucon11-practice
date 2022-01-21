@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
@@ -18,6 +19,8 @@ func getSession(r *http.Request) (*sessions.Session, error) {
 	return session, nil
 }
 
+var availableUsersCache = map[string]bool{}
+
 func getUserIDFromSession(c echo.Context) (string, int, error) {
 	session, err := getSession(c.Request())
 	if err != nil {
@@ -29,16 +32,26 @@ func getUserIDFromSession(c echo.Context) (string, int, error) {
 	}
 
 	jiaUserID := _jiaUserID.(string)
-	var count int
+	// var count int
 
-	err = db.Get(&count, "SELECT COUNT(*) FROM `user` WHERE `jia_user_id` = ?",
-		jiaUserID)
-	if err != nil {
-		return "", http.StatusInternalServerError, fmt.Errorf("db error: %v", err)
-	}
+	// err = db.Get(&count, "SELECT COUNT(*) FROM `user` WHERE `jia_user_id` = ?",
+	// 	jiaUserID)
+	// if err != nil {
+	// 	return "", http.StatusInternalServerError, fmt.Errorf("db error: %v", err)
+	// }
 
-	if count == 0 {
-		return "", http.StatusUnauthorized, fmt.Errorf("not found: user")
+	// if count == 0 {
+	// 	return "", http.StatusUnauthorized, fmt.Errorf("not found: user")
+	// }
+
+	isAvailable, ok := availableUsersCache[jiaUserID]
+	if !ok || !isAvailable {
+		var created_at time.Time
+		err = db.Get(&created_at, "SELECT `created_at` FROM `user` WHERE `jia_user_id` = ? LIMIT 1",
+			jiaUserID)
+		if err != nil {
+			return "", http.StatusInternalServerError, fmt.Errorf("db error: %v", err)
+		}
 	}
 
 	return jiaUserID, 0, nil
@@ -84,6 +97,8 @@ func postAuthentication(c echo.Context) error {
 		// c.Logger().Errorf("db error: %v", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
+
+	availableUsersCache[jiaUserID] = true
 
 	session, err := getSession(c.Request())
 	if err != nil {
