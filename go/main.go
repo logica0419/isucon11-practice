@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net"
-	"net/http"
-	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
@@ -109,7 +107,7 @@ func (mc *MySQLConnectionEnv) ConnectDB() (*sqlx.DB, error) {
 
 func init() {
 	// sessionStore = sessions.NewCookieStore([]byte(getEnv("SESSION_KEY", "isucondition")))
-	sessionStore = sessions.NewCookieStore(nil)
+	sessionStore = sessions.NewCookieStore([]byte{})
 
 	key, err := ioutil.ReadFile(jiaJWTSigningKeyPath)
 	if err != nil {
@@ -171,8 +169,6 @@ func main() {
 
 	go insertConditionTicker()
 	go resetTrendCacheTicker()
-
-	go http.ListenAndServe(":6060", nil)
 
 	socketFilePath := "/temp/isucon.sock"
 	listener, err := net.Listen("unix", socketFilePath)
